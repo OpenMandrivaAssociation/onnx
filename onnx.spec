@@ -40,6 +40,8 @@ https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0002-Use-system-protobuf-a
 https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0004-Add-fixes-for-use-with-onnxruntime.patch
 # Fix linkage
 onnx-absl-linkage.patch
+# Allow current protobuf
+onnx-allow-current-protobuf.patch
 
 %global _description %{expand:
 %{name} provides an open source format for AI models, both deep learning and
