@@ -1,0 +1,32 @@
+diff -up onnx-1.17.0/CMakeLists.txt.omv~ onnx-1.17.0/CMakeLists.txt
+--- onnx-1.17.0/CMakeLists.txt.omv~	2025-03-25 00:44:19.748949191 +0100
++++ onnx-1.17.0/CMakeLists.txt	2025-03-25 00:46:26.521136577 +0100
+@@ -506,15 +506,15 @@ target_compile_definitions(onnx_proto PR
+ 
+ if(ONNX_USE_LITE_PROTO)
+   if(TARGET protobuf::libprotobuf-lite)
+-    target_link_libraries(onnx_proto PUBLIC protobuf::libprotobuf-lite PRIVATE ${protobuf_ABSL_USED_TARGETS})
++    target_link_libraries(onnx_proto PUBLIC protobuf::libprotobuf-lite PRIVATE ${protobuf_ABSL_USED_TARGETS} -labsl_log_internal_check_op -labsl_log_internal_message -labsl_log_internal_nullguard)
+   else()
+-    target_link_libraries(onnx_proto PUBLIC ${PROTOBUF_LITE_LIBRARIES})
++    target_link_libraries(onnx_proto PUBLIC ${PROTOBUF_LITE_LIBRARIES} -labsl_log_internal_check_op -labsl_log_internal_message -labsl_log_internal_nullguard)
+   endif()
+ else()
+   if(TARGET protobuf::libprotobuf)
+-    target_link_libraries(onnx_proto PUBLIC protobuf::libprotobuf PRIVATE ${protobuf_ABSL_USED_TARGETS})
++    target_link_libraries(onnx_proto PUBLIC protobuf::libprotobuf PRIVATE ${protobuf_ABSL_USED_TARGETS} -labsl_log_internal_check_op -labsl_log_internal_message -labsl_log_internal_nullguard)
+   else()
+-    target_link_libraries(onnx_proto PUBLIC ${PROTOBUF_LIBRARIES})
++    target_link_libraries(onnx_proto PUBLIC ${PROTOBUF_LIBRARIES} -labsl_log_internal_check_op -labsl_log_internal_message -labsl_log_internal_nullguard)
+   endif()
+ endif()
+ add_onnx_global_defines(onnx_proto)
+@@ -533,7 +533,7 @@ target_include_directories(onnx PUBLIC
+   $<BUILD_INTERFACE:${ONNX_ROOT}>
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+   $<INSTALL_INTERFACE:include>)
+-target_link_libraries(onnx PUBLIC onnx_proto)
++target_link_libraries(onnx PUBLIC onnx_proto -labsl_log_internal_check_op -labsl_log_internal_message -labsl_log_internal_nullguard)
+ add_onnx_global_defines(onnx)
+ 
+ if(BUILD_ONNX_PYTHON)
