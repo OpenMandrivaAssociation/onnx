@@ -25,6 +25,7 @@ BuildRequires:  findutils
 BuildRequires:  zlib-devel
 BuildRequires:  python-devel
 BuildRequires:  python%{pyver}dist(pip)
+BuildRequires:  python%{pyver}dist(protobuf)
 BuildRequires:  python%{pyver}dist(pytest)
 BuildRequires:  python%{pyver}dist(pybind11)
 BuildRequires:  cmake(pybind11)
