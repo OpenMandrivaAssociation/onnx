@@ -1,7 +1,7 @@
-diff -up onnx-1.17.0/CMakeLists.txt.omv~ onnx-1.17.0/CMakeLists.txt
---- onnx-1.17.0/CMakeLists.txt.omv~	2025-03-25 00:44:19.748949191 +0100
-+++ onnx-1.17.0/CMakeLists.txt	2025-03-25 00:46:26.521136577 +0100
-@@ -506,15 +506,15 @@ target_compile_definitions(onnx_proto PR
+diff -up onnx-1.18.0/CMakeLists.txt.4~ onnx-1.18.0/CMakeLists.txt
+--- onnx-1.18.0/CMakeLists.txt.4~	2025-06-09 18:39:12.369618144 +0200
++++ onnx-1.18.0/CMakeLists.txt	2025-06-09 18:39:39.967767360 +0200
+@@ -503,15 +503,15 @@ target_compile_features(onnx_proto PUBLI
  
  if(ONNX_USE_LITE_PROTO)
    if(TARGET protobuf::libprotobuf-lite)
@@ -21,7 +21,7 @@ diff -up onnx-1.17.0/CMakeLists.txt.omv~ onnx-1.17.0/CMakeLists.txt
    endif()
  endif()
  add_onnx_global_defines(onnx_proto)
-@@ -533,7 +533,7 @@ target_include_directories(onnx PUBLIC
+@@ -532,7 +532,7 @@ target_include_directories(onnx PUBLIC
    $<BUILD_INTERFACE:${ONNX_ROOT}>
    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
    $<INSTALL_INTERFACE:include>)
@@ -29,4 +29,4 @@ diff -up onnx-1.17.0/CMakeLists.txt.omv~ onnx-1.17.0/CMakeLists.txt
 +target_link_libraries(onnx PUBLIC onnx_proto -labsl_log_internal_check_op -labsl_log_internal_message -labsl_log_internal_nullguard)
  add_onnx_global_defines(onnx)
  
- if(BUILD_ONNX_PYTHON)
+ if(ONNX_BUILD_PYTHON)
