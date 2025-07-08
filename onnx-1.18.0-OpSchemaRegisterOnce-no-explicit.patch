@@ -1,0 +1,12 @@
+diff -up onnx-1.18.0/onnx/defs/schema.h.omv~ onnx-1.18.0/onnx/defs/schema.h
+--- onnx-1.18.0/onnx/defs/schema.h.omv~	2025-07-09 01:02:48.698408269 +0200
++++ onnx-1.18.0/onnx/defs/schema.h	2025-07-09 01:02:51.510351362 +0200
+@@ -980,7 +980,7 @@ class OpSchemaRegistry final : public IS
+   class OpSchemaRegisterOnce final {
+    public:
+     // Export to cpp custom register macro
+-    explicit OpSchemaRegisterOnce(
++    OpSchemaRegisterOnce(
+         OpSchema op_schema,
+         int opset_version_to_load = 0,
+         bool fail_duplicate_schema = true) {
