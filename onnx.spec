@@ -5,7 +5,7 @@
 
 Name:       onnx
 Version:    1.18.0
-Release:    2
+Release:    3
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 
