@@ -4,12 +4,8 @@
 %define devname %mklibname -d onnx
 
 Name:       onnx
-# This is intentionally an old version.
-# Please don't update it until this issue is fixed
-# or someone has ported the patch
-# https://github.com/microsoft/onnxruntime/issues/24561
-Version:    1.17.0
-Release:    1
+Version:    1.18.0
+Release:    3
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 
@@ -35,9 +31,10 @@ https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0000-Build-shared-librarie
 https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0002-Use-system-protobuf-and-require-parameterized.patch
 # Add fixes for use with onnxruntime
 https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0004-Add-fixes-for-use-with-onnxruntime.patch
-onnx-allow-current-protobuf.patch
+# Also for onnxruntime, see https://github.com/microsoft/onnxruntime/issues/24561
+https://github.com/microsoft/onnxruntime/raw/refs/heads/main/cmake/patches/onnx/onnx.patch
 # Fix linkage
-#onnx-absl-linkage.patch
+onnx-absl-linkage.patch
 
 %global _description %{expand:
 %{name} provides an open source format for AI models, both deep learning and

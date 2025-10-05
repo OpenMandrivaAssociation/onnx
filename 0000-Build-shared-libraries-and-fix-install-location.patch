@@ -1,17 +1,7 @@
-From 8a2a2327e89fb62bb74ced121cbdf8c3a59ad04f Mon Sep 17 00:00:00 2001
-From: Alejandro Alvarez Ayllon <a.alvarezayllon@gmail.com>
-Date: Sat, 24 Feb 2024 14:48:45 +0100
-Subject: [PATCH 0/6] Build shared libraries and fix install location
-
----
- CMakeLists.txt | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 4dd56b6e..7f79cc9a 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -367,7 +367,7 @@ list(REMOVE_ITEM __tmp_srcs "${ONNX_ROOT}/onnx/cpp2py_export.cc")
+diff -up onnx-1.18.0/CMakeLists.txt.1~ onnx-1.18.0/CMakeLists.txt
+--- onnx-1.18.0/CMakeLists.txt.1~	2025-05-08 19:33:57.000000000 +0200
++++ onnx-1.18.0/CMakeLists.txt	2025-06-09 18:37:31.379159568 +0200
+@@ -470,7 +470,7 @@ list(REMOVE_ITEM __tmp_srcs "${ONNX_ROOT
  list(REMOVE_ITEM __tmp_srcs ${onnx_gtests_src})
  list(APPEND ONNX_SRCS ${__tmp_srcs})
  
@@ -20,16 +10,16 @@ index 4dd56b6e..7f79cc9a 100644
  add_dependencies(onnx_proto gen_onnx_operators_proto gen_onnx_data_proto)
  target_include_directories(onnx_proto PUBLIC
    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-@@ -400,6 +400,8 @@ else()
+@@ -495,6 +495,8 @@ else()
    set(ONNX_API_DEFINE "-DONNX_API=__attribute__\(\(__visibility__\(\"default\"\)\)\)")
    set_target_properties(onnx_proto PROPERTIES CXX_VISIBILITY_PRESET hidden)
    set_target_properties(onnx_proto PROPERTIES VISIBILITY_INLINES_HIDDEN 1)
 +  set_target_properties(onnx_proto PROPERTIES VERSION ${ONNX_VERSION}
-+                                            SOVERSION ${ONNX_VERSION})
++                                              SOVERSION ${ONNX_VERSION})
  endif()
  target_compile_definitions(onnx_proto PRIVATE ${ONNX_API_DEFINE})
- 
-@@ -423,7 +425,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "AIX")
+ target_compile_features(onnx_proto PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
+@@ -519,7 +521,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "AIX")
    # So, create a object library
    add_library(onnx OBJECT ${ONNX_SRCS})
  else()
@@ -38,9 +28,9 @@ index 4dd56b6e..7f79cc9a 100644
 +  set_target_properties(onnx PROPERTIES VERSION ${ONNX_VERSION}
 +                                        SOVERSION ${ONNX_VERSION})
  endif()
- 
- target_include_directories(onnx PUBLIC
-@@ -606,6 +610,17 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/onnx
+ set_target_properties(onnx PROPERTIES CXX_VISIBILITY_PRESET hidden)
+ set_target_properties(onnx PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
+@@ -669,6 +673,17 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY
          FILES_MATCHING
          PATTERN "*.h")
  
@@ -58,7 +48,7 @@ index 4dd56b6e..7f79cc9a 100644
  configure_file(
    ${PROJECT_SOURCE_DIR}/cmake/ONNXConfigVersion.cmake.in
    ${PROJECT_BINARY_DIR}/ONNXConfigVersion.cmake
-@@ -623,6 +638,9 @@ install(EXPORT ONNXTargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/ONNX")
+@@ -727,6 +742,9 @@ endif()
  install(TARGETS
    onnx onnx_proto
    EXPORT ONNXTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
@@ -68,6 +58,3 @@ index 4dd56b6e..7f79cc9a 100644
  
  if(ONNX_BUILD_TESTS)
    include(${ONNX_ROOT}/cmake/unittest.cmake)
--- 
-2.43.0
-
