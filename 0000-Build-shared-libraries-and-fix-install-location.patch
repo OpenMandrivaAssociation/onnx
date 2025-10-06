@@ -1,25 +1,25 @@
-diff -up onnx-1.18.0/CMakeLists.txt.1~ onnx-1.18.0/CMakeLists.txt
---- onnx-1.18.0/CMakeLists.txt.1~	2025-05-08 19:33:57.000000000 +0200
-+++ onnx-1.18.0/CMakeLists.txt	2025-06-09 18:37:31.379159568 +0200
-@@ -470,7 +470,7 @@ list(REMOVE_ITEM __tmp_srcs "${ONNX_ROOT
- list(REMOVE_ITEM __tmp_srcs ${onnx_gtests_src})
- list(APPEND ONNX_SRCS ${__tmp_srcs})
+diff -up onnx-1.19.0/CMakeLists.txt.1~ onnx-1.19.0/CMakeLists.txt
+--- onnx-1.19.0/CMakeLists.txt.1~	2025-08-26 23:37:09.000000000 +0200
++++ onnx-1.19.0/CMakeLists.txt	2025-10-06 02:02:54.193264335 +0200
+@@ -409,7 +409,7 @@ relative_protobuf_generate_cpp(ONNX_PROT
+                                onnx/onnx-operators.in.proto
+                                onnx/onnx-data.in.proto)
  
--add_library(onnx_proto ${ONNX_PROTO_SRCS} ${ONNX_PROTO_HDRS})
-+add_library(onnx_proto SHARED ${ONNX_PROTO_SRCS} ${ONNX_PROTO_HDRS})
- add_dependencies(onnx_proto gen_onnx_operators_proto gen_onnx_data_proto)
- target_include_directories(onnx_proto PUBLIC
-   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-@@ -495,6 +495,8 @@ else()
-   set(ONNX_API_DEFINE "-DONNX_API=__attribute__\(\(__visibility__\(\"default\"\)\)\)")
-   set_target_properties(onnx_proto PROPERTIES CXX_VISIBILITY_PRESET hidden)
-   set_target_properties(onnx_proto PROPERTIES VISIBILITY_INLINES_HIDDEN 1)
-+  set_target_properties(onnx_proto PROPERTIES VERSION ${ONNX_VERSION}
-+                                              SOVERSION ${ONNX_VERSION})
- endif()
- target_compile_definitions(onnx_proto PRIVATE ${ONNX_API_DEFINE})
- target_compile_features(onnx_proto PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
-@@ -519,7 +521,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "AIX")
+-add_library(onnx_proto ${ONNX_PROTO_SRCS})
++add_library(onnx_proto SHARED ${ONNX_PROTO_SRCS})
+ 
+ file(GLOB_RECURSE __tmp_srcs "${ONNX_ROOT}/onnx/*.h" "${ONNX_ROOT}/onnx/*.cc")
+ file(GLOB_RECURSE onnx_gtests_src "${ONNX_ROOT}/onnx/test/cpp/*.h"
+@@ -423,6 +423,8 @@ list(APPEND ONNX_SRCS ${__tmp_srcs})
+ # Hide all symbols we don't need
+ set_target_properties(onnx_proto PROPERTIES CXX_VISIBILITY_PRESET hidden)
+ set_target_properties(onnx_proto PROPERTIES VISIBILITY_INLINES_HIDDEN 1)
++set_target_properties(onnx_proto PROPERTIES VERSION ${ONNX_VERSION}
++                                            SOVERSION ${ONNX_VERSION})
+ 
+ set(LINKED_PROTOBUF_TARGET protobuf::libprotobuf)
+ if(ONNX_USE_LITE_PROTO)
+@@ -459,7 +461,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "AIX")
    # So, create a object library
    add_library(onnx OBJECT ${ONNX_SRCS})
  else()
@@ -30,7 +30,7 @@ diff -up onnx-1.18.0/CMakeLists.txt.1~ onnx-1.18.0/CMakeLists.txt
  endif()
  set_target_properties(onnx PROPERTIES CXX_VISIBILITY_PRESET hidden)
  set_target_properties(onnx PROPERTIES VISIBILITY_INLINES_HIDDEN ON)
-@@ -669,6 +673,17 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY
+@@ -538,6 +542,17 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY
          FILES_MATCHING
          PATTERN "*.h")
  
@@ -48,13 +48,14 @@ diff -up onnx-1.18.0/CMakeLists.txt.1~ onnx-1.18.0/CMakeLists.txt
  configure_file(
    ${PROJECT_SOURCE_DIR}/cmake/ONNXConfigVersion.cmake.in
    ${PROJECT_BINARY_DIR}/ONNXConfigVersion.cmake
-@@ -727,6 +742,9 @@ endif()
- install(TARGETS
+@@ -590,6 +605,10 @@ install(TARGETS
    onnx onnx_proto
    EXPORT ONNXTargets DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ 
 +install(TARGETS
 +  onnx_cpp2py_export
 +  DESTINATION "${PY_SITEARCH}/onnx")
- 
- if(ONNX_BUILD_TESTS)
-   include(${ONNX_ROOT}/cmake/unittest.cmake)
++
+ install(EXPORT ONNXTargets
+   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/ONNX"
+   NAMESPACE ONNX::
