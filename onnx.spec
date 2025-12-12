@@ -9,7 +9,7 @@ Name:       onnx
 # or someone has ported the patch
 # https://github.com/microsoft/onnxruntime/issues/24561
 Version:    1.17.0
-Release:    1
+Release:    2
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 
