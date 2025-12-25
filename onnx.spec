@@ -26,6 +26,7 @@ BuildRequires:  python%{pyver}dist(pip)
 BuildRequires:  python%{pyver}dist(protobuf)
 BuildRequires:  python%{pyver}dist(pytest)
 BuildRequires:  python%{pyver}dist(pybind11)
+BuildRequires:  python%{pyver}dist(setuptools)
 BuildRequires:  cmake(pybind11)
 BuildRequires:  protobuf-devel
 
