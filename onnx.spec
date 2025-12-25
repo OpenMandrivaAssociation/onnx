@@ -17,6 +17,7 @@ URL:        https://github.com/onnx/onnx
 Source0:    https://github.com/onnx/onnx/archive/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  cmake >= 3.13
+BuildRequires:  ninja
 BuildRequires:  make
 BuildRequires:  findutils
 BuildRequires:  zlib-devel
