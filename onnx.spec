@@ -8,8 +8,8 @@ Name:       onnx
 # Please don't update it until this issue is fixed
 # or someone has ported the patch
 # https://github.com/microsoft/onnxruntime/issues/24561
-Version:    1.17.0
-Release:    3
+Version:    1.22.0
+Release:    1
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 
@@ -32,12 +32,12 @@ BuildRequires:  protobuf-devel
 
 %patchlist
 # Build shared libraries and fix install location 
-https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0000-Build-shared-libraries-and-fix-install-location.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0000-Build-shared-libraries-and-fix-install-location.patch
 # Use system protobuf and require parameterized
-https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0002-Use-system-protobuf-and-require-parameterized.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0002-Use-system-protobuf-and-require-parameterized.patch
 # Add fixes for use with onnxruntime
-https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0004-Add-fixes-for-use-with-onnxruntime.patch
-onnx-allow-current-protobuf.patch
+# dropped (no longer applies): https://src.fedoraproject.org/rpms/onnx/raw/rawhide/f/0004-Add-fixes-for-use-with-onnxruntime.patch
+# dropped (no longer applies): onnx-allow-current-protobuf.patch
 # Fix linkage
 #onnx-absl-linkage.patch
 
