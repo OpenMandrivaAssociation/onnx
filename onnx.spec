@@ -33,6 +33,7 @@ BuildRequires:  python%{pyver}dist(scikit-build-core)
 BuildRequires:  python%{pyver}dist(numpy)
 BuildRequires:  python%{pyver}dist(ml-dtypes)
 BuildRequires:  python%{pyver}dist(typing-extensions)
+BuildRequires:  python%{pyver}dist(nanobind)
 BuildRequires:  cmake(pybind11)
 BuildRequires:  protobuf-devel
 
@@ -101,7 +102,9 @@ sed -i -e 's,CMAKE_CXX_STANDARD 17,CMAKE_CXX_STANDARD 20,g' CMakeLists.txt
 
 cd ..
 # Build python libs. Release wheels have no DWARF and fail the build.
+# 1.22 runs "python -m nanobind" and otherwise git-clones nanobind.
 export SKBUILD_CMAKE_BUILD_TYPE=RelWithDebInfo
+export CMAKE_ARGS="-DFETCHCONTENT_FULLY_DISCONNECTED=ON"
 %py_build
 
 %install
