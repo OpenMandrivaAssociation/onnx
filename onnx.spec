@@ -86,6 +86,8 @@ sed -r \
 
 # Make absl Great Again
 sed -i -e 's,CMAKE_CXX_STANDARD 17,CMAKE_CXX_STANDARD 20,g' CMakeLists.txt
+# 1.22 installs libonnx.so with no soname. Keep the versioned runtime library.
+sed -i '/CXX_VISIBILITY_PRESET hidden/a set_target_properties(onnx onnx_proto PROPERTIES VERSION ${ONNX_VERSION} SOVERSION ${ONNX_VERSION})' CMakeLists.txt
 
 %build
 %cmake \
@@ -109,13 +111,17 @@ export CMAKE_ARGS="-DFETCHCONTENT_FULLY_DISCONNECTED=ON"
 
 %install
 %ninja_install -C build
-# Need to remove empty directories
-find "%{buildroot}/%{_includedir}" -type d -empty -delete
-find "%{buildroot}/%{python3_sitearch}" -type d -empty -delete
+# The Python build drops CMakeFiles into directories that the C++ install copies.
+find "%{buildroot}%{_includedir}" -depth -type d -name CMakeFiles -print0 | xargs -0 -r rm -rf
+find "%{buildroot}%{_includedir}" -type d -empty -delete
 # Install *.proto files
-install -p "./onnx/"*.proto -t "%{buildroot}/%{_includedir}/onnx/"
+install -p "./onnx/"*.proto -t "%{buildroot}%{_includedir}/onnx/"
 
 %py_install
+# The Python tree does not exist until the wheel is installed.
+if [ -d "%{buildroot}%{python3_sitearch}" ]; then
+	find "%{buildroot}%{python3_sitearch}" -type d -empty -delete
+fi
 
 %files -n %{libname}
 %license LICENSE
