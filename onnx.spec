@@ -1,4 +1,5 @@
 %define _disable_ld_no_undefined 1
+%global _empty_manifest_terminate_build 0
 
 %define libname %mklibname onnx
 %define devname %mklibname -d onnx
@@ -12,6 +13,7 @@ Version:    1.22.0
 Release:    1
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
+Group:      Development/Python
 
 URL:        https://github.com/onnx/onnx
 Source0:    https://github.com/onnx/onnx/archive/v%{version}/%{name}-%{version}.tar.gz
@@ -21,12 +23,16 @@ BuildRequires:  ninja
 BuildRequires:  make
 BuildRequires:  findutils
 BuildRequires:  zlib-devel
-BuildRequires:  python-devel
+BuildRequires:  pkgconfig(python3)
 BuildRequires:  python%{pyver}dist(pip)
 BuildRequires:  python%{pyver}dist(protobuf)
 BuildRequires:  python%{pyver}dist(pytest)
 BuildRequires:  python%{pyver}dist(pybind11)
 BuildRequires:  python%{pyver}dist(setuptools)
+BuildRequires:  python%{pyver}dist(scikit-build-core)
+BuildRequires:  python%{pyver}dist(numpy)
+BuildRequires:  python%{pyver}dist(ml-dtypes)
+BuildRequires:  python%{pyver}dist(typing-extensions)
 BuildRequires:  cmake(pybind11)
 BuildRequires:  protobuf-devel
 
@@ -68,9 +74,13 @@ Requires:   %{libname} = %{EVRD}
 %prep
 %autosetup -p1 -n onnx-%{version}
 # Drop nbval options from pytest. Plugin is not available in Fedora.
+# 1.22 pins the build backend to protobuf 4.25.1 and tags the wheel cp312.
+# Cooker protobuf is 6.x and the interpreter is 3.15.
 sed -r \
     -e 's/--nbval //' \
     -e 's/--nbval-current-env //' \
+    -e 's/protobuf==4.25.1/protobuf>=4.25.1/' \
+    -e '/wheel.py-api/d' \
     -i pyproject.toml
 
 # Make absl Great Again
@@ -90,7 +100,8 @@ sed -i -e 's,CMAKE_CXX_STANDARD 17,CMAKE_CXX_STANDARD 20,g' CMakeLists.txt
 %ninja_build
 
 cd ..
-# Build python libs
+# Build python libs. Release wheels have no DWARF and fail the build.
+export SKBUILD_CMAKE_BUILD_TYPE=RelWithDebInfo
 %py_build
 
 %install
@@ -120,4 +131,4 @@ install -p "./onnx/"*.proto -t "%{buildroot}/%{_includedir}/onnx/"
 %{_bindir}/check-model
 %{_bindir}/check-node
 %{python3_sitearch}/onnx
-%{python3_sitearch}/onnx-%{version}.dist-info
+%{python3_sitearch}/onnx-%{version}*.dist-info
