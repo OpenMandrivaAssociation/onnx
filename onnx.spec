@@ -10,7 +10,7 @@ Name:       onnx
 # or someone has ported the patch
 # https://github.com/microsoft/onnxruntime/issues/24561
 Version:    1.22.0
-Release:    3
+Release:    4
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 Group:      Development/Python
@@ -93,10 +93,11 @@ sed -i '/CXX_VISIBILITY_PRESET hidden/a set_target_properties(onnx onnx_proto PR
 # ORT links symbols that are not marked ONNX_API: OpSchema::Attr templates,
 # DataTypeUtils::ToType, ParseData, ReplaceAll, loaded_schema_version.
 # Hidden visibility leaves them out of libonnx.so. The Python extension
-# builds from this tree too, so restore hidden before that build. Otherwise
-# both DSOs export the type-map singleton and interpose on each other.
-# scikit-build reuses build/ and relinks libonnx. 1.22.0-2 installed that
-# hidden library. Keep the C++ build in its own directory.
+# must stay hidden, or both DSOs export the type-map singleton.
+# ninja install re-runs CMake when CMakeLists.txt is newer. 1.22.0-3
+# restored hidden visibility for the Python build, and that reconfigure
+# relinked the hidden library. Save the default-visibility libraries
+# and copy them back over that relink.
 sed -i 's/CXX_VISIBILITY_PRESET hidden/CXX_VISIBILITY_PRESET default/' CMakeLists.txt
 export CMAKE_BUILD_DIR=cxxbuild
 %cmake \
@@ -106,10 +107,9 @@ export CMAKE_BUILD_DIR=cxxbuild
     -DBUILD_ONNX_PYTHON:BOOL=ON \
     -DPY_SITEARCH=%{python3_sitearch} \
     -G Ninja
-# Generate protobuf header and source files
-#ninja_build gen_onnx_proto
-# Build
 %ninja_build
+mkdir -p %{_builddir}/onnx-shared
+cp -a libonnx.so* libonnx_proto.so* %{_builddir}/onnx-shared/
 
 cd ..
 unset CMAKE_BUILD_DIR
@@ -122,6 +122,12 @@ export CMAKE_ARGS="-DFETCHCONTENT_FULLY_DISCONNECTED=ON"
 
 %install
 %ninja_install -C cxxbuild
+cp -a %{_builddir}/onnx-shared/libonnx.so* %{_builddir}/onnx-shared/libonnx_proto.so* %{buildroot}%{_libdir}/
+# Fail here if the installed library is still the hidden one.
+nm -D --defined-only %{buildroot}%{_libdir}/libonnx.so.%{version} | grep -q 14DataTypeUtils || {
+    echo "libonnx.so is missing DataTypeUtils exports" >&2
+    exit 1
+}
 # The Python build drops CMakeFiles into directories that the C++ install copies.
 find "%{buildroot}%{_includedir}" -depth -type d -name CMakeFiles -print0 | xargs -0 -r rm -rf
 find "%{buildroot}%{_includedir}" -type d -empty -delete
