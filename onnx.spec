@@ -10,7 +10,7 @@ Name:       onnx
 # or someone has ported the patch
 # https://github.com/microsoft/onnxruntime/issues/24561
 Version:    1.22.0
-Release:    2
+Release:    3
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 Group:      Development/Python
@@ -95,7 +95,10 @@ sed -i '/CXX_VISIBILITY_PRESET hidden/a set_target_properties(onnx onnx_proto PR
 # Hidden visibility leaves them out of libonnx.so. The Python extension
 # builds from this tree too, so restore hidden before that build. Otherwise
 # both DSOs export the type-map singleton and interpose on each other.
+# scikit-build reuses build/ and relinks libonnx. 1.22.0-2 installed that
+# hidden library. Keep the C++ build in its own directory.
 sed -i 's/CXX_VISIBILITY_PRESET hidden/CXX_VISIBILITY_PRESET default/' CMakeLists.txt
+export CMAKE_BUILD_DIR=cxxbuild
 %cmake \
     -DONNX_USE_LITE_PROTO=OFF \
     -DONNX_USE_PROTOBUF_SHARED_LIBS=ON \
@@ -109,6 +112,7 @@ sed -i 's/CXX_VISIBILITY_PRESET hidden/CXX_VISIBILITY_PRESET default/' CMakeList
 %ninja_build
 
 cd ..
+unset CMAKE_BUILD_DIR
 sed -i 's/CXX_VISIBILITY_PRESET default/CXX_VISIBILITY_PRESET hidden/' CMakeLists.txt
 # Build python libs. Release wheels have no DWARF and fail the build.
 # 1.22 runs "python -m nanobind" and otherwise git-clones nanobind.
@@ -117,7 +121,7 @@ export CMAKE_ARGS="-DFETCHCONTENT_FULLY_DISCONNECTED=ON"
 %py_build
 
 %install
-%ninja_install -C build
+%ninja_install -C cxxbuild
 # The Python build drops CMakeFiles into directories that the C++ install copies.
 find "%{buildroot}%{_includedir}" -depth -type d -name CMakeFiles -print0 | xargs -0 -r rm -rf
 find "%{buildroot}%{_includedir}" -type d -empty -delete
