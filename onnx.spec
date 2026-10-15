@@ -124,7 +124,7 @@ export CMAKE_ARGS="-DFETCHCONTENT_FULLY_DISCONNECTED=ON"
 %ninja_install -C cxxbuild
 cp -a %{_builddir}/onnx-shared/libonnx.so* %{_builddir}/onnx-shared/libonnx_proto.so* %{buildroot}%{_libdir}/
 # Fail here if the installed library is still the hidden one.
-nm -D --defined-only %{buildroot}%{_libdir}/libonnx.so.%{version} | grep -q 14DataTypeUtils || {
+nm -D --defined-only %{buildroot}%{_libdir}/libonnx.so.%{version} | grep -q 13DataTypeUtils || {
     echo "libonnx.so is missing DataTypeUtils exports" >&2
     exit 1
 }
