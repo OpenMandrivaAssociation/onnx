@@ -10,7 +10,7 @@ Name:       onnx
 # or someone has ported the patch
 # https://github.com/microsoft/onnxruntime/issues/24561
 Version:    1.22.0
-Release:    1
+Release:    2
 Summary:    Open standard for machine learning interoperability
 License:    Apache-2.0
 Group:      Development/Python
@@ -90,6 +90,12 @@ sed -i -e 's,CMAKE_CXX_STANDARD 17,CMAKE_CXX_STANDARD 20,g' CMakeLists.txt
 sed -i '/CXX_VISIBILITY_PRESET hidden/a set_target_properties(onnx onnx_proto PROPERTIES VERSION ${ONNX_VERSION} SOVERSION ${ONNX_VERSION})' CMakeLists.txt
 
 %build
+# ORT links symbols that are not marked ONNX_API: OpSchema::Attr templates,
+# DataTypeUtils::ToType, ParseData, ReplaceAll, loaded_schema_version.
+# Hidden visibility leaves them out of libonnx.so. The Python extension
+# builds from this tree too, so restore hidden before that build. Otherwise
+# both DSOs export the type-map singleton and interpose on each other.
+sed -i 's/CXX_VISIBILITY_PRESET hidden/CXX_VISIBILITY_PRESET default/' CMakeLists.txt
 %cmake \
     -DONNX_USE_LITE_PROTO=OFF \
     -DONNX_USE_PROTOBUF_SHARED_LIBS=ON \
@@ -103,6 +109,7 @@ sed -i '/CXX_VISIBILITY_PRESET hidden/a set_target_properties(onnx onnx_proto PR
 %ninja_build
 
 cd ..
+sed -i 's/CXX_VISIBILITY_PRESET default/CXX_VISIBILITY_PRESET hidden/' CMakeLists.txt
 # Build python libs. Release wheels have no DWARF and fail the build.
 # 1.22 runs "python -m nanobind" and otherwise git-clones nanobind.
 export SKBUILD_CMAKE_BUILD_TYPE=RelWithDebInfo
